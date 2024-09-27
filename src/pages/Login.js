@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 function Login(){
@@ -7,6 +8,7 @@ function Login(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
 
     //Handler to submit form
@@ -23,30 +25,32 @@ function Login(){
         console.log({email,password});
 
         try {
-            // Call your backend's login API
             const response = await fetch('http://localhost:8080/api/auth/login', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                email,
-                password,
-              }),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
             });
         
             if (response.ok) {
-              console.log('Login successful!');
-              const data = await response.json();
-              console.log(data); // This will be the JWT token once you implement JWT
-              // Handle successful login (e.g., store token in localStorage)
+                // Handle successful login
+                const data = await response.json();
+                console.log('Login successful!');
+                console.log(data); // This should be your JWT token or user details
+                navigate('/tasks'); // Redirect to tasks page
             } else {
-              const errorData = await response.json();
-              setError(errorData.message || 'Login failed. Please try again.');
+                const errorData = await response.text();  // Read response as text in case it's not JSON
+                setError(errorData || 'Login failed. Please try again.');
             }
-          } catch (err) {
+        } catch (err) {
+            console.log('Catch Error:', err); 
             setError('An error occurred. Please try again.');
-          }
+        }
+        
     }
 
 
